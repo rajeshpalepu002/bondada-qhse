@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>HSE Quiz – Solar Site Safety – Week 20</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--navy:#0a1f44;--blue:#1a3a6e;--accent:#00c2cb;--green:#22c55e;--red:#ef4444;--card:#162d5a;--text:#e8f0fe;--sub:#a0b4d6;}
+  body{font-family:'Segoe UI',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;padding:0 0 40px}
+  header{background:var(--blue);padding:16px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px #0006;position:sticky;top:0;z-index:10}
+  .logo{font-size:28px}
+  .header-text h1{font-size:15px;font-weight:700}
+  .header-text p{font-size:11px;color:var(--sub)}
+  #score-bar{background:var(--card);margin:16px;border-radius:14px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+  .score-pill{background:var(--navy);border:2px solid var(--accent);border-radius:50px;padding:6px 18px;font-size:14px;font-weight:700;color:var(--accent)}
+  .q-counter{font-size:13px;color:var(--sub)}
+  #prog-wrap{margin:0 16px 8px;background:#1e3560;border-radius:50px;height:8px;overflow:hidden}
+  #prog-fill{height:8px;background:linear-gradient(90deg,var(--accent),#00e5ff);border-radius:50px;transition:width .4s ease;width:0%}
+  .card{margin:12px 16px;background:var(--card);border-radius:18px;padding:24px 20px;box-shadow:0 4px 20px #0005}
+  h2.screen-title{font-size:20px;margin-bottom:8px;color:var(--accent)}
+  .sub-text{font-size:13px;color:var(--sub);margin-bottom:20px;line-height:1.6}
+  input[type=text]{width:100%;padding:14px 16px;border-radius:12px;border:2px solid var(--blue);background:#0d1f3e;color:var(--text);font-size:15px;outline:none;transition:border .2s}
+  input[type=text]:focus{border-color:var(--accent)}
+  .btn{display:block;width:100%;margin-top:14px;padding:15px;border-radius:13px;border:none;background:linear-gradient(135deg,var(--accent),#007cf0);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+  .btn-outline{background:transparent;border:2px solid var(--accent);color:var(--accent);margin-top:10px}
+  .q-label{font-size:11px;letter-spacing:1px;color:var(--sub);margin-bottom:8px;text-transform:uppercase}
+  .q-text{font-size:16px;font-weight:600;line-height:1.55;margin-bottom:20px}
+  .options{display:flex;flex-direction:column;gap:11px}
+  .opt-btn{background:#0d1f3e;border:2px solid #2a4a82;border-radius:13px;padding:14px 16px;text-align:left;color:var(--text);font-size:14px;cursor:pointer;transition:all .2s;line-height:1.4;-webkit-tap-highlight-color:transparent}
+  .opt-btn.correct{background:#064e2a;border-color:var(--green);color:#bbf7d0}
+  .opt-btn.wrong{background:#450a0a;border-color:var(--red);color:#fecaca}
+  .opt-btn.dimmed{opacity:.4;pointer-events:none}
+  #explanation{margin-top:16px;padding:13px 15px;border-radius:12px;font-size:13px;line-height:1.55;display:none}
+  #explanation.show-correct{background:#064e2a;border-left:4px solid var(--green);color:#bbf7d0;display:block}
+  #explanation.show-wrong{background:#450a0a;border-left:4px solid var(--red);color:#fecaca;display:block}
+  .trophy{font-size:60px;margin-bottom:10px;text-align:center}
+  .result-center{text-align:center}
+  .score-big{font-size:56px;font-weight:900;line-height:1;color:var(--accent)}
+  .score-denom{font-size:18px;color:var(--sub);margin-bottom:12px}
+  .celebrate{background:linear-gradient(135deg,#064e2a,#0a2e1a);border:2px solid var(--green);border-radius:14px;padding:14px 16px;margin:14px 0;font-size:14px;color:#bbf7d0;line-height:1.6}
+  .try-again{background:linear-gradient(135deg,#450a0a,#2d0606);border:2px solid var(--red);border-radius:14px;padding:14px 16px;margin:14px 0;font-size:14px;color:#fecaca;line-height:1.6}
+  .meta-row{display:flex;justify-content:space-around;background:#0d1f3e;border-radius:12px;padding:12px 8px;margin:14px 0}
+  .meta-item{text-align:center}
+  .meta-val{font-size:15px;font-weight:700;color:var(--accent)}
+  .meta-lbl{font-size:10px;color:var(--sub);margin-top:2px;text-transform:uppercase}
+  .screenshot-note{font-size:11px;color:var(--sub);margin-top:8px;text-align:center}
+  #submit-status{margin-top:14px;padding:12px 16px;border-radius:12px;font-size:13px;text-align:center;background:#0d1f3e;color:var(--sub)}
+  #submit-status.ok{background:#064e2a;color:#bbf7d0}
+  #submit-status.err{background:#450a0a;color:#fecaca}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">☀️</span>
+  <div class="header-text">
+    <h1>HSE Weekly Safety Quiz</h1>
+    <p>Solar Site – Untrained Labour Safety – Week 20</p>
+  </div>
+</header>
+
+<div id="score-bar">
+  <div class="q-counter" id="q-counter">Question 0 of 10</div>
+  <div class="score-pill">Score: <span id="live-score">0</span>/10</div>
+</div>
+<div id="prog-wrap"><div id="prog-fill"></div></div>
+
+<!-- NAME SCREEN -->
+<div class="card" id="name-screen">
+  <h2 class="screen-title">👷 Before You Begin</h2>
+  <p class="sub-text">Enter your full name. Your result will be automatically recorded in the safety register — no login needed.</p>
+  <input id="name-input" type="text" placeholder="Your Full Name" autocomplete="name"/>
+  <button class="btn" onclick="startQuiz()">Start Quiz ➜</button>
+</div>
+
+<!-- QUIZ CARD -->
+<div class="card" id="quiz-card" style="display:none">
+  <div class="q-label" id="q-label">Question 1</div>
+  <div class="q-text" id="q-text"></div>
+  <div class="options" id="options"></div>
+  <div id="explanation"></div>
+  <button class="btn" id="next-btn" style="display:none" onclick="nextQ()">Next Question ➜</button>
+</div>
+
+<!-- RESULT SCREEN -->
+<div class="card" id="result-screen" style="display:none">
+  <div class="trophy" id="trophy">🏆</div>
+  <div class="result-center">
+    <h2 class="screen-title" style="text-align:center">Quiz Complete!</h2>
+    <div id="result-name" style="font-size:14px;color:var(--sub);margin-bottom:12px"></div>
+    <div class="score-big" id="score-big"></div>
+    <div class="score-denom">out of 10</div>
+  </div>
+  <div id="result-msg"></div>
+  <div class="meta-row">
+    <div class="meta-item"><div class="meta-val" id="m-start">--</div><div class="meta-lbl">Start</div></div>
+    <div class="meta-item"><div class="meta-val" id="m-end">--</div><div class="meta-lbl">End</div></div>
+    <div class="meta-item"><div class="meta-val" id="m-dur">--</div><div class="meta-lbl">Duration</div></div>
+    <div class="meta-item"><div class="meta-val" id="m-pct">--</div><div class="meta-lbl">Score %</div></div>
+  </div>
+  <div id="submit-status">📡 Submitting your result...</div>
+  <p class="screenshot-note">📸 Screenshot this screen to claim your reward (if eligible)</p>
+  <button class="btn btn-outline" onclick="restartQuiz()">🔄 Take Quiz Again</button>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPHigTxnTpR0SLDg-2SlWwTeARPya27ygsVtvrcvtVkv3N3rlH8A8vD4H7wgwSwk3k/exec";
+const TOPIC = "Working with Untrained Labour at Ground Mounting Solar Site";
+const WEEK  = "Week 20";
+// ───────────────────────────────────────────────────────────────
+
+const questions = [
+  {
+    q: "Before untrained labourers begin work on a solar site, what is the MINIMUM safety requirement that must be completed?",
+    opts: ["Issue PPE and send them to work immediately","Conduct a site-specific induction covering hazards, emergency procedures and safe work practices","Show them the site layout map only","Ask a senior worker to guide them verbally on the job"],
+    ans: 1,
+    exp: "✅ A site-specific induction is mandatory before any untrained worker begins work — it covers hazards, controls and emergency response."
+  },
+  {
+    q: "An untrained labourer is about to handle a solar panel without gloves. As a supervisor, your FIRST action should be:",
+    opts: ["Let them continue — panels are not sharp","Stop the work immediately and provide correct PPE before resuming","Report it to the HSE manager after the shift","Ask another worker to watch them"],
+    ans: 1,
+    exp: "✅ Work must be stopped immediately when unsafe acts are observed. PPE must be provided before resuming — this is a supervisor's primary duty."
+  },
+  {
+    q: "Which of the following is the greatest electrical hazard specifically associated with ground-mounted solar PV installations?",
+    opts: ["Low voltage shocks from panel frames","DC arc flash from live PV strings which cannot be switched off by isolation alone","Noise from inverters","Trip hazards from cable trays"],
+    ans: 1,
+    exp: "✅ Solar PV strings generate DC voltage whenever exposed to light — they cannot be de-energised by switching off. DC arc flash is a severe and unique hazard."
+  },
+  {
+    q: "An untrained worker asks if they can walk across installed solar panels to reach the other side of the array. You should:",
+    opts: ["Allow it if they walk carefully","Allow it only in the morning before panels heat up","Strictly prohibit it — panels must never be walked on, and a safe walkway must be used","Allow it if they wear soft-soled shoes"],
+    ans: 2,
+    exp: "✅ Walking on solar panels risks electric shock, panel damage and falls. Designated walkways must always be used — no exceptions."
+  },
+  {
+    q: "During manual handling of solar panels on site, which combination of PPE is most critical for untrained labourers?",
+    opts: ["Safety helmet and high-visibility vest only","Cut-resistant gloves, safety footwear, and eye protection","Hearing protection and dust mask only","Hard hat and sunscreen"],
+    ans: 1,
+    exp: "✅ Panel edges are sharp and heavy — cut-resistant gloves prevent lacerations, safety footwear prevents crush injuries, and eye protection guards against debris."
+  },
+  {
+    q: "What is the correct action if an untrained labourer discovers a cracked or damaged solar panel on site?",
+    opts: ["Continue installing it as performance is not affected","Mark it with tape and inform the supervisor — do not handle or install it","Dispose of it in the general waste skip","Try to repair it using site tools"],
+    ans: 1,
+    exp: "✅ Damaged panels can expose live conductors and may contain hazardous materials. They must be isolated, reported, and handled only by trained personnel."
+  },
+  {
+    q: "Heat stress is a significant risk at outdoor solar sites. Which control measure is MOST effective for protecting untrained labourers?",
+    opts: ["Providing sunglasses and encouraging workers to drink when thirsty","Scheduling heavy work during cooler hours, providing regular water breaks, and monitoring workers for heat illness symptoms","Asking workers to wear extra clothing to avoid sunburn","Allowing workers to remove PPE to stay cool"],
+    ans: 1,
+    exp: "✅ Engineering and administrative controls — rescheduling, hydration, and active monitoring — are more effective than relying on workers to self-manage heat stress."
+  },
+  {
+    q: "A Toolbox Talk (TBT) on a solar construction site should be conducted:",
+    opts: ["Once a month is sufficient","Only when a new worker joins the site","Every working day before work begins, covering the day's specific tasks and hazards","Only after an incident occurs"],
+    ans: 2,
+    exp: "✅ Daily TBTs ensure all workers — especially untrained ones — are briefed on that day's specific tasks, hazards and controls before work starts."
+  },
+  {
+    q: "When working near the inverter station on a ground-mounted solar site, untrained labourers should:",
+    opts: ["Feel free to enter and inspect equipment if curious","Only enter if accompanied by a trained and authorised person, and never touch any electrical equipment","Enter to cool down during breaks as inverters are air-conditioned","Use the inverter room to store tools and materials"],
+    ans: 1,
+    exp: "✅ Inverter stations contain high-voltage DC and AC equipment. Entry must be restricted to authorised trained personnel only — untrained workers must never enter alone."
+  },
+  {
+    q: "Which of the following best describes a supervisor's legal and moral responsibility when deploying untrained labour on a solar construction site?",
+    opts: ["Untrained workers are responsible for their own safety once inducted","The contractor is fully responsible — the supervisor just assigns tasks","The supervisor must ensure workers are competent for their tasks, provide adequate supervision, and intervene immediately when unsafe conditions or behaviours are observed","Responsibility lies only with the HSE officer on site"],
+    ans: 2,
+    exp: "✅ Supervisors have a duty of care to ensure competency, provide supervision, and actively intervene — this is both a legal requirement and a moral obligation under ISO 45001."
+  }
+];
+
+let idx=0, score=0, userName='', startTime=null, endTime=null;
+
+const fmtTime = d => d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+const fmtFull = d => d.toLocaleString('en-GB');
+const durStr  = (s,e) => { const sec=Math.round((e-s)/1000); return `${Math.floor(sec/60)}m ${sec%60}s`; };
+const pctStr  = s => Math.round((s/questions.length)*100)+'%';
+
+function startQuiz(){
+  const n = document.getElementById('name-input').value.trim();
+  if(!n){ alert('Please enter your name to continue.'); return; }
+  userName=n; startTime=new Date();
+  document.getElementById('name-screen').style.display='none';
+  document.getElementById('quiz-card').style.display='block';
+  loadQ();
+}
+
+function loadQ(){
+  const q = questions[idx];
+  document.getElementById('q-label').textContent = `Question ${idx+1} of ${questions.length}`;
+  document.getElementById('q-counter').textContent = `Question ${idx+1} of ${questions.length}`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prog-fill').style.width = `${(idx/questions.length)*100}%`;
+  const op = document.getElementById('options');
+  op.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt-btn'; b.textContent=o;
+    b.onclick=()=>answer(i,b);
+    op.appendChild(b);
+  });
+  document.getElementById('explanation').className='';
+  document.getElementById('explanation').style.display='none';
+  document.getElementById('next-btn').style.display='none';
+}
+
+function answer(i,btn){
+  const q=questions[idx];
+  document.querySelectorAll('.opt-btn').forEach(b=>b.classList.add('dimmed'));
+  const exp=document.getElementById('explanation');
+  if(i===q.ans){
+    btn.classList.remove('dimmed'); btn.classList.add('correct');
+    exp.textContent=q.exp; exp.className='show-correct'; score++;
+    document.getElementById('live-score').textContent=score;
+  } else {
+    btn.classList.remove('dimmed'); btn.classList.add('wrong');
+    document.querySelectorAll('.opt-btn')[q.ans].classList.remove('dimmed');
+    document.querySelectorAll('.opt-btn')[q.ans].classList.add('correct');
+    exp.textContent=q.exp.replace('✅','❌'); exp.className='show-wrong';
+  }
+  document.getElementById('next-btn').style.display='block';
+}
+
+function nextQ(){ idx++; idx<questions.length ? loadQ() : showResult(); }
+
+function showResult(){
+  endTime=new Date();
+  document.getElementById('quiz-card').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  document.getElementById('prog-fill').style.width='100%';
+  const pct=score/questions.length;
+  document.getElementById('trophy').textContent   = pct>=0.8?'🏆':'📋';
+  document.getElementById('result-name').textContent = `👷 ${userName}`;
+  document.getElementById('score-big').textContent   = score;
+  document.getElementById('m-start').textContent = fmtTime(startTime);
+  document.getElementById('m-end').textContent   = fmtTime(endTime);
+  document.getElementById('m-dur').textContent   = durStr(startTime,endTime);
+  document.getElementById('m-pct').textContent   = pctStr(score);
+  document.getElementById('result-msg').innerHTML = pct>=0.8
+    ?`<div class="celebrate">🎉 Excellent! You scored ${pctStr(score)} — Safety Champion!<br>Screenshot this screen and share in the WhatsApp group to claim your reward.</div>`
+    :`<div class="try-again">💪 You scored ${pctStr(score)}. Review the safety guidelines and try again — safety knowledge saves lives!</div>`;
+  submitViaJsonp();
+}
+
+function submitViaJsonp(){
+  const status = document.getElementById('submit-status');
+  const params = new URLSearchParams({
+    name:      userName,
+    score:     `${score}/${questions.length}`,
+    pct:       pctStr(score),
+    status:    score/questions.length>=0.8?'PASS':'FAIL',
+    startTime: fmtFull(startTime),
+    endTime:   fmtFull(endTime),
+    timeTaken: durStr(startTime,endTime),
+    topic:     TOPIC,
+    week:      WEEK,
+    callback:  'handleResponse'
+  });
+
+  window.handleResponse = function(data){
+    status.textContent = data.result==='success'
+      ? '✅ Result saved to the safety register!'
+      : '⚠️ Error: ' + (data.msg||'Unknown error');
+    status.className = data.result==='success' ? 'ok' : 'err';
+    const old=document.getElementById('jsonp-script');
+    if(old) old.remove();
+  };
+
+  setTimeout(()=>{
+    if(status.className!=='ok' && status.className!=='err'){
+      status.textContent='⚠️ Could not confirm submission. Please screenshot your result.';
+      status.className='err';
+    }
+  }, 6000);
+
+  const script=document.createElement('script');
+  script.id='jsonp-script';
+  script.src=SCRIPT_URL+'?'+params.toString();
+  document.body.appendChild(script);
+}
+
+function restartQuiz(){
+  idx=0; score=0; startTime=null; endTime=null;
+  document.getElementById('live-score').textContent='0';
+  document.getElementById('prog-fill').style.width='0%';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('name-screen').style.display='block';
+  document.getElementById('name-input').value='';
+  document.getElementById('q-counter').textContent='Question 0 of 10';
+  document.getElementById('submit-status').textContent='📡 Submitting your result...';
+  document.getElementById('submit-status').className='';
+}
+</script>
+</body>
+</html>
