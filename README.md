@@ -1,2 +1,2 @@
 # bondada-qhse
-Quality and Safety Quiz
+Quality and Safety Quiz for employees
